@@ -1,0 +1,90 @@
+<html>
+
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            /* height: 90vh; */
+            /* width: 200;
+            height: 200; */
+        }
+    </style>
+</head>
+
+<body>
+    <canvas height="500" width="500"></canvas>
+
+    <script>
+        const canvas = document.querySelector('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const tabuleiro = [
+            ['', '', 'a', 'g'],
+            ['a', '>', '>', ''],
+            ['p', 'g', 'p', ''],
+            ['', '', '', '']
+        ]
+
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.height, canvas.width);
+
+        const tamanhoCasa = (canvas.width) / tabuleiro[0].length;
+        const metadeTamanhoCasa = tamanhoCasa / 2;
+
+        for (let i = 0; i < tabuleiro.length; i++) {
+            const linha = tabuleiro[i];
+            for (let j = 0; j < linha.length; j++) {
+                const cell = linha[j];
+
+                const xi = (tamanhoCasa * j)
+                const yi = (tamanhoCasa * i)
+
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#7f7042';
+                ctx.strokeRect(xi, yi, tamanhoCasa, tamanhoCasa);
+
+                switch (cell) {
+                    case 'a':
+                        ctx.fillStyle = 'blue';
+                        ctx.beginPath();
+                        ctx.arc(xi + metadeTamanhoCasa, yi + metadeTamanhoCasa, tamanhoCasa / 4, 0, Math.PI * 2)
+                        ctx.fill();
+                        break;
+                    case 'g':
+                        ctx.fillStyle = 'green';
+                        ctx.beginPath();
+                        ctx.arc(xi + metadeTamanhoCasa, yi + metadeTamanhoCasa, tamanhoCasa / 4, 0, Math.PI * 2)
+                        ctx.fill();
+                        break;
+                    case 'p':
+                        ctx.fillStyle = 'purple';
+                        ctx.beginPath();
+                        ctx.arc(xi + metadeTamanhoCasa, yi + metadeTamanhoCasa, tamanhoCasa / 4, 0, Math.PI * 2)
+                        ctx.fill();
+                        break;
+
+                    case '>':
+                        const altura = tamanhoCasa / 4;
+                        const metadeAltura = altura / 2;
+                        ctx.fillStyle = 'blue'
+                        ctx.fillRect(xi - metadeTamanhoCasa - metadeAltura, yi + metadeTamanhoCasa - metadeAltura, tamanhoCasa, altura)
+
+                        ctx.beginPath();
+                        ctx.arc(xi + metadeTamanhoCasa - metadeAltura, yi + metadeTamanhoCasa, metadeAltura, 0, Math.PI * 2)
+                        ctx.fill()
+                        break;
+                }
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>
