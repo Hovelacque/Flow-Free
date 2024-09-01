@@ -24,8 +24,8 @@
         const ctx = canvas.getContext('2d');
 
         const tabuleiro = [
-            ['', '', 'a', 'g'],
-            ['a', '>', '>', ''],
+            ['', '>', 'a', 'g'],
+            ['a', '^', '', ''],
             ['p', 'g', 'p', ''],
             ['', '', '', '']
         ]
@@ -34,53 +34,171 @@
         ctx.fillRect(0, 0, canvas.height, canvas.width);
 
         const tamanhoCasa = (canvas.width) / tabuleiro[0].length;
-        const metadeTamanhoCasa = tamanhoCasa / 2;
+        const metadeTamanhoCasa = tamanhoCasa / 2;        
+        const altura = tamanhoCasa / 4;
+        const metadeAltura = altura / 2;
+    
+        class Cell{
+            constructor(posicao, x, y, cor = ''){
+                this.posicao = posicao;
+                this.x= x;
+                this.y = y;
+                this.cor = cor;
+                this.ponto = cor != '';
+                this.pipes = {
+                    up: false,
+                    down: false,
+                    left: false,
+                    right: false
+                }
+            }
 
+            draw(){
+                ctx.strokeStyle = '#7f7042';
+                ctx.strokeRect(this.x, this.y, tamanhoCasa, tamanhoCasa);
+
+                if(this.ponto)
+                    this.drawPonto();
+                if(this.pipes.right)
+                    this.drawRight();
+                if(this.pipes.left)
+                    this.drawLeft();
+                if(this.pipes.up)
+                    this.drawUp();
+                if(this.pipes.down)
+                    this.drawDown();
+            }
+
+            drawPonto(){
+                ctx.fillStyle = this.cor;
+                ctx.beginPath();
+                ctx.arc(this.x + metadeTamanhoCasa, this.y + metadeTamanhoCasa, altura, 0, Math.PI * 2)
+                ctx.fill();
+            }
+            drawRight(){
+                ctx.fillStyle = this.cor;
+                ctx.fillRect(this.x + metadeTamanhoCasa,this.y + metadeTamanhoCasa - metadeAltura, metadeTamanhoCasa, altura);
+                ctx.beginPath();
+                ctx.arc(this.x + metadeTamanhoCasa,this.y + metadeTamanhoCasa, metadeAltura, 0, Math.PI * 2)
+                ctx.fill()
+            }
+            drawLeft(){
+                ctx.fillStyle = this.cor;
+                ctx.fillRect(this.x,this.y + metadeTamanhoCasa - metadeAltura, metadeTamanhoCasa, altura);
+                ctx.beginPath();
+                ctx.arc(this.x + metadeTamanhoCasa,this.y + metadeTamanhoCasa, metadeAltura, 0, Math.PI * 2)
+                ctx.fill()
+            }
+            drawUp(){
+                ctx.fillStyle = this.cor;
+                ctx.fillRect(this.x+ metadeTamanhoCasa - metadeAltura,this.y, altura, metadeTamanhoCasa);
+                ctx.beginPath();
+                ctx.arc(this.x + metadeTamanhoCasa,this.y + metadeTamanhoCasa, metadeAltura, 0, Math.PI * 2)
+                ctx.fill()
+            }
+            drawDown(){
+                ctx.fillStyle = this.cor;
+                ctx.fillRect(this.x + metadeTamanhoCasa - metadeAltura,this.y +metadeTamanhoCasa, altura, metadeTamanhoCasa);
+                ctx.beginPath();
+                ctx.arc(this.x + metadeTamanhoCasa,this.y + metadeTamanhoCasa, metadeAltura, 0, Math.PI * 2)
+                ctx.fill()
+            }
+        }
+
+        const mapa = []
         for (let i = 0; i < tabuleiro.length; i++) {
             const linha = tabuleiro[i];
+            const novaLinha = [];
             for (let j = 0; j < linha.length; j++) {
                 const cell = linha[j];
 
+                const posicao = (j+1)+(i*linha.length)
                 const xi = (tamanhoCasa * j)
                 const yi = (tamanhoCasa * i)
-
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = '#7f7042';
-                ctx.strokeRect(xi, yi, tamanhoCasa, tamanhoCasa);
-
-                switch (cell) {
-                    case 'a':
-                        ctx.fillStyle = 'blue';
-                        ctx.beginPath();
-                        ctx.arc(xi + metadeTamanhoCasa, yi + metadeTamanhoCasa, tamanhoCasa / 4, 0, Math.PI * 2)
-                        ctx.fill();
-                        break;
-                    case 'g':
-                        ctx.fillStyle = 'green';
-                        ctx.beginPath();
-                        ctx.arc(xi + metadeTamanhoCasa, yi + metadeTamanhoCasa, tamanhoCasa / 4, 0, Math.PI * 2)
-                        ctx.fill();
-                        break;
-                    case 'p':
-                        ctx.fillStyle = 'purple';
-                        ctx.beginPath();
-                        ctx.arc(xi + metadeTamanhoCasa, yi + metadeTamanhoCasa, tamanhoCasa / 4, 0, Math.PI * 2)
-                        ctx.fill();
-                        break;
-
-                    case '>':
-                        const altura = tamanhoCasa / 4;
-                        const metadeAltura = altura / 2;
-                        ctx.fillStyle = 'blue'
-                        ctx.fillRect(xi - metadeTamanhoCasa - metadeAltura, yi + metadeTamanhoCasa - metadeAltura, tamanhoCasa, altura)
-
-                        ctx.beginPath();
-                        ctx.arc(xi + metadeTamanhoCasa - metadeAltura, yi + metadeTamanhoCasa, metadeAltura, 0, Math.PI * 2)
-                        ctx.fill()
-                        break;
-                }
+                let cor = '';
+                if(cell == 'a')
+                cor = 'blue'
+            else if(cell == 'g')
+                cor = 'green'
+            else if(cell == 'p')
+                cor = 'purple'
+                mapa.push(new Cell(posicao,xi,yi,cor))
             }
         }
+
+mapa[4].pipes.right = true;
+mapa[5].pipes.left = true;
+mapa[5].pipes.up = true;
+mapa[1].cor = 'blue';
+mapa[1].pipes.down = true;
+mapa[1].pipes.right = true;
+mapa[2].pipes.left = true;
+mapa.forEach(x=>x.draw())
+
+        // for (let i = 0; i < tabuleiro.length; i++) {
+        //     const linha = tabuleiro[i];
+        //     for (let j = 0; j < linha.length; j++) {
+        //         const cell = linha[j];
+
+        //         const xi = (tamanhoCasa * j)
+        //         const yi = (tamanhoCasa * i)
+
+        //         ctx.lineWidth = 1;
+        //         ctx.strokeStyle = '#7f7042';
+        //         ctx.strokeRect(xi, yi, tamanhoCasa, tamanhoCasa);
+
+
+        //         const altura = tamanhoCasa / 4;
+        //         const metadeAltura = altura / 2;
+
+        //         switch (cell) {
+        //             case 'a':
+        //                 ctx.fillStyle = 'blue';
+        //                 ctx.beginPath();
+        //                 ctx.arc(xi + metadeTamanhoCasa, yi + metadeTamanhoCasa, tamanhoCasa / 4, 0, Math.PI * 2)
+        //                 ctx.fill();
+        //                 break;
+        //             case 'g':
+        //                 ctx.fillStyle = 'green';
+        //                 ctx.beginPath();
+        //                 ctx.arc(xi + metadeTamanhoCasa, yi + metadeTamanhoCasa, tamanhoCasa / 4, 0, Math.PI * 2)
+        //                 ctx.fill();
+        //                 break;
+        //             case 'p':
+        //                 ctx.fillStyle = 'purple';
+        //                 ctx.beginPath();
+        //                 ctx.arc(xi + metadeTamanhoCasa, yi + metadeTamanhoCasa, tamanhoCasa / 4, 0, Math.PI * 2)
+        //                 ctx.fill();
+        //                 break;
+
+        //             case '>':
+        //                 ctx.fillStyle = 'blue'
+        //                 ctx.fillRect(xi - metadeTamanhoCasa - metadeAltura, yi + metadeTamanhoCasa - metadeAltura, tamanhoCasa, altura)
+
+        //                 ctx.beginPath();
+        //                 ctx.arc(xi + metadeTamanhoCasa - metadeAltura, yi + metadeTamanhoCasa, metadeAltura, 0, Math.PI * 2)
+        //                 ctx.fill()
+        //                 break;
+        //             case '<':
+        //                 ctx.fillStyle = 'blue'
+        //                 ctx.fillRect(xi + metadeTamanhoCasa - metadeAltura, yi + metadeTamanhoCasa - metadeAltura, tamanhoCasa, altura)
+
+        //                 ctx.beginPath();
+        //                 ctx.arc(xi + metadeTamanhoCasa - metadeAltura, yi + metadeTamanhoCasa, metadeAltura, 0, Math.PI * 2)
+        //                 ctx.fill()
+        //                 break;
+                        
+        //             case '^':
+        //                 ctx.fillStyle = 'green'
+        //                 ctx.fillRect(xi + metadeTamanhoCasa - metadeAltura, yi + metadeTamanhoCasa - metadeAltura, tamanhoCasa, altura)
+
+        //                 ctx.beginPath();
+        //                 ctx.arc(xi + metadeTamanhoCasa - metadeAltura, yi + metadeTamanhoCasa, metadeAltura, 0, Math.PI * 2)
+        //                 ctx.fill()
+        //                 break;
+        //         }
+        //     }
+        // }
 
 
 
